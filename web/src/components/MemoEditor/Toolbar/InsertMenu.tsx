@@ -1,6 +1,6 @@
 import { LatLng } from "leaflet";
 import { uniqBy } from "lodash-es";
-import { FileIcon, LinkIcon, LoaderIcon, type LucideIcon, MapPinIcon, Maximize2Icon, MoreHorizontalIcon, PlusIcon } from "lucide-react";
+import { CheckSquareIcon, FileIcon, LinkIcon, LoaderIcon, type LucideIcon, MapPinIcon, Maximize2Icon, MoreHorizontalIcon, PlusIcon } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDebounce } from "react-use";
 import { useReverseGeocoding } from "@/components/map";
@@ -26,7 +26,7 @@ import type { LocalFile } from "../types/attachment";
 const InsertMenu = (props: InsertMenuProps) => {
   const t = useTranslate();
   const { state, actions, dispatch } = useEditorContext();
-  const { location: initialLocation, onLocationChange, onToggleFocusMode, isUploading: isUploadingProp } = props;
+  const { location: initialLocation, onLocationChange, onToggleFocusMode, onToggleTodoPanel, isUploading: isUploadingProp } = props;
 
   const [linkDialogOpen, setLinkDialogOpen] = useState(false);
   const [locationDialogOpen, setLocationDialogOpen] = useState(false);
@@ -122,6 +122,12 @@ const InsertMenu = (props: InsertMenuProps) => {
     () =>
       [
         {
+          key: "todo",
+          label: "Todo List",
+          icon: CheckSquareIcon,
+          onClick: () => onToggleTodoPanel?.(),
+        },
+        {
           key: "upload",
           label: t("common.upload"),
           icon: FileIcon,
@@ -140,7 +146,7 @@ const InsertMenu = (props: InsertMenuProps) => {
           onClick: handleLocationClick,
         },
       ] satisfies Array<{ key: string; label: string; icon: LucideIcon; onClick: () => void }>,
-    [handleLocationClick, handleOpenLinkDialog, handleUploadClick, t],
+    [handleLocationClick, handleOpenLinkDialog, handleUploadClick, onToggleTodoPanel, t],
   );
 
   return (

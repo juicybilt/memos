@@ -1,5 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import useCurrentUser from "@/hooks/useCurrentUser";
@@ -9,7 +9,7 @@ import { handleError } from "@/lib/error";
 import { cn } from "@/lib/utils";
 import { useTranslate } from "@/utils/i18n";
 import { convertVisibilityFromString } from "@/utils/memo";
-import { EditorContent, EditorMetadata, EditorToolbar, FocusModeExitButton, FocusModeOverlay, TimestampPopover } from "./components";
+import { EditorContent, EditorMetadata, EditorToolbar, FocusModeExitButton, FocusModeOverlay, TimestampPopover, TodoListPanel } from "./components";
 import FormattingToolbar from "./Toolbar/FormattingToolbar";
 import { FOCUS_MODE_STYLES } from "./constants";
 import type { EditorRefActions } from "./Editor";
@@ -42,6 +42,8 @@ const MemoEditorImpl: React.FC<MemoEditorProps> = ({
   const { userGeneralSetting } = useAuth();
 
   const memoName = memo?.name;
+  const [showTodoPanel, setShowTodoPanel] = useState(false);
+  const handleToggleTodoPanel = () => setShowTodoPanel((prev) => !prev);
 
   // Get default visibility from user settings
   const defaultVisibility = userGeneralSetting?.memoVisibility ? convertVisibilityFromString(userGeneralSetting.memoVisibility) : undefined;
@@ -102,6 +104,7 @@ const MemoEditorImpl: React.FC<MemoEditorProps> = ({
 
       // Reset editor state to initial values
       dispatch(actions.reset());
+      setShowTodoPanel(false);
       if (!memoName && defaultVisibility) {
         dispatch(actions.setMetadata({ visibility: defaultVisibility }));
       }
@@ -145,14 +148,19 @@ const MemoEditorImpl: React.FC<MemoEditorProps> = ({
           </div>
         )}
 
-        {/* Editor content grows to fill available space in focus mode */}
-        <EditorContent ref={editorRef} placeholder={placeholder} autoFocus={autoFocus} />
+        {/* Editor content — hidden (but mounted) when todo panel is active so editorRef stays valid */}
+        <div className={cn("w-full", showTodoPanel && "hidden")}>
+          <EditorContent ref={editorRef} placeholder={placeholder} autoFocus={autoFocus} />
+        </div>
+
+        {/* Todo list panel — shown when active */}
+        {showTodoPanel && <TodoListPanel onClose={() => setShowTodoPanel(false)} />}
 
         {/* Metadata and toolbar grouped together at bottom */}
         <div className="w-full flex flex-col gap-2">
-          <FormattingToolbar editorRef={editorRef} />
+          {!showTodoPanel && <FormattingToolbar editorRef={editorRef} />}
           <EditorMetadata memoName={memoName} />
-          <EditorToolbar onSave={handleSave} onCancel={onCancel} memoName={memoName} />
+          <EditorToolbar onSave={handleSave} onCancel={onCancel} memoName={memoName} onToggleTodoPanel={handleToggleTodoPanel} />
         </div>
       </div>
     </>

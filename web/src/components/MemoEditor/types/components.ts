@@ -25,6 +25,7 @@ export interface EditorToolbarProps {
   onSave: () => void;
   onCancel?: () => void;
   memoName?: string;
+  onToggleTodoPanel?: () => void;
 }
 
 export interface EditorMetadataProps {
@@ -69,6 +70,7 @@ export interface InsertMenuProps {
   location?: Location;
   onLocationChange: (location?: Location) => void;
   onToggleFocusMode?: () => void;
+  onToggleTodoPanel?: () => void;
   memoName?: string;
 }
 

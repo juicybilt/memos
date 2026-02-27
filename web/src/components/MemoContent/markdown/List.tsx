@@ -54,6 +54,9 @@ export const ListItem = ({ children, className, node: _node, ...domProps }: List
           "[&>button]:mr-2 [&>button]:align-middle",
           // Inline paragraph for task text
           "[&>p]:inline [&>p]:m-0",
+          // Strikethrough and dim text when checked (Radix uses data-state="checked")
+          "[&:has(button[data-state=checked])>p]:line-through",
+          "[&:has(button[data-state=checked])>p]:opacity-50",
           className,
         )}
         {...domProps}
